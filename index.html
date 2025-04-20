@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Contact Me</title>
+  <title>hello⁉️</title>
   <style>
     :root {
       --primary-color: #4f46e5;
@@ -29,6 +29,7 @@
       justify-content: center;
       height: 100vh;
       padding: 20px;
+      text-align: center;
     }
 
     h1 {
@@ -64,10 +65,16 @@
       width: 100%;
     }
 
-    .link-btn {
+    .email-link {
+      color: var(--primary-color);
+      font-size: 1.1rem;
       text-decoration: none;
-      width: 100%;
-      max-width: 300px;
+      transition: color 0.3s ease;
+    }
+
+    .email-link:hover {
+      color: var(--hover-color);
+      text-decoration: underline;
     }
 
     @media (min-width: 600px) {
@@ -79,15 +86,16 @@
 </head>
 <body>
 
-  <h1>Contact Me</h1>
-  <button class="btn" onclick="toggleContact()">Show Contact Info</button>
+  <h1>new fone, who dis?</h1>
+  <button class="btn" onclick="toggleContact()">click me?</button>
 
   <div id="contact-options">
-    <a class="link-btn" href="mailto:yourname@example.com">
-      <button class="btn">Email Me</button>
-    </a>
-    <a class="link-btn" href="https://instagram.com/yourusername" target="_blank">
-      <button class="btn">Instagram</button>
+    <div>
+      <p>e-mail meh</p>
+      <a class="email-link" href="mailto:catchmeinside@halfus.com.au">catchmeinside@halfus.com.au</a>
+    </div>
+    <a href="https://www.youtube.com/watch?v=rz5TGN7eUcM" target="_blank">
+      <button class="btn">see meme</button>
     </a>
   </div>
 
