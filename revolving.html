@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revolving Door Canvas</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: 'Space Grotesk', 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 25% 20%, rgba(255, 180, 180, 0.35), transparent 50%),
+        radial-gradient(circle at 80% 15%, rgba(160, 210, 255, 0.4), transparent 45%),
+        linear-gradient(160deg, #04060d, #0e1b2f 55%, #172c4d);
+      color: #f4f7ff;
+      padding: 40px 20px 120px;
+    }
+
+    .wrapper {
+      text-align: center;
+      max-width: 640px;
+    }
+
+    h1 {
+      margin: 0 0 20px;
+      letter-spacing: 0.3em;
+      font-size: clamp(1.2rem, 3vw, 1.6rem);
+      color: #fefefe;
+    }
+
+    canvas {
+      width: min(480px, 90vw);
+      height: min(480px, 90vw);
+      background: radial-gradient(circle at 50% 50%, rgba(18, 32, 58, 0.8), rgba(5, 10, 18, 0.95));
+      border-radius: 32px;
+      box-shadow:
+        0 40px 90px rgba(0, 0, 0, 0.6),
+        inset 0 0 25px rgba(255, 255, 255, 0.08);
+      display: block;
+      margin: 0 auto;
+    }
+
+    .message {
+      margin-top: 26px;
+      font-size: clamp(0.85rem, 2vw, 1rem);
+      letter-spacing: 0.18em;
+      line-height: 1.6;
+      color: #e4ecff;
+    }
+
+    .message strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h1>REVOLVING DOOR</h1>
+    <canvas id="doorCanvas" width="600" height="600" aria-hidden="true"></canvas>
+    <div class="message">
+      <strong>i tried to write a joke about revolving doors…</strong>
+      but it just kept going around in circles.
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('doorCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const center = { x: canvas.width / 2, y: canvas.height / 2 - 20 };
+    const frameRadius = 150;
+    const doorHeight = 320;
+    const panelBaseWidth = 90;
+    const topY = center.y - doorHeight / 2;
+    const bottomY = center.y + doorHeight / 2;
+    const colors = ['#ffb3ba', '#b8d8ff', '#bbf7cf', '#dec2ff'];
+    let angle = 0;
+
+    function hexToRgba(hex, alpha) {
+      const clean = hex.replace('#', '');
+      const bigint = parseInt(clean, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+
+    function drawFloor() {
+      ctx.save();
+      ctx.translate(center.x, bottomY + 70);
+      ctx.scale(1, 0.3);
+      const gradient = ctx.createRadialGradient(0, 0, frameRadius * 0.4, 0, 0, frameRadius * 1.5);
+      gradient.addColorStop(0, 'rgba(80, 120, 200, 0.45)');
+      gradient.addColorStop(0.6, 'rgba(15, 25, 50, 0.8)');
+      gradient.addColorStop(1, 'rgba(5, 8, 18, 0.95)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(0, 0, frameRadius * 1.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawFrameBack() {
+      ctx.save();
+      const bodyGradient = ctx.createLinearGradient(center.x, topY, center.x, bottomY);
+      bodyGradient.addColorStop(0, 'rgba(12, 20, 34, 0.95)');
+      bodyGradient.addColorStop(1, 'rgba(6, 10, 18, 0.95)');
+      ctx.fillStyle = bodyGradient;
+      ctx.fillRect(center.x - frameRadius, topY, frameRadius * 2, doorHeight);
+
+      ctx.fillStyle = 'rgba(6, 10, 18, 0.95)';
+      ctx.beginPath();
+      ctx.ellipse(center.x, bottomY, frameRadius, frameRadius * 0.3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawFrameFront() {
+      ctx.save();
+      ctx.fillStyle = 'rgba(18, 30, 50, 0.95)';
+      ctx.beginPath();
+      ctx.ellipse(center.x, topY, frameRadius, frameRadius * 0.28, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      const glare = ctx.createLinearGradient(center.x - frameRadius, topY, center.x + frameRadius, topY);
+      glare.addColorStop(0, 'rgba(255,255,255,0.05)');
+      glare.addColorStop(0.5, 'rgba(255,255,255,0.12)');
+      glare.addColorStop(1, 'rgba(255,255,255,0.05)');
+      ctx.globalAlpha = 0.35;
+      ctx.fillStyle = glare;
+      ctx.fillRect(center.x - frameRadius, topY, frameRadius * 2, doorHeight);
+      ctx.globalAlpha = 1;
+
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(center.x - frameRadius, topY);
+      ctx.lineTo(center.x - frameRadius, bottomY);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(center.x + frameRadius, topY);
+      ctx.lineTo(center.x + frameRadius, bottomY);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawPanel(panelAngle, color) {
+      const depth = Math.cos(panelAngle);
+      const radial = Math.sin(panelAngle);
+      const height = doorHeight - 60;
+      const yTop = center.y - height / 2;
+      const yBottom = center.y + height / 2;
+
+      const xInner = center.x;
+      const xOuter = center.x + radial * (frameRadius - 18);
+      const leftX = Math.min(xInner, xOuter);
+      const rightX = Math.max(xInner, xOuter);
+      const minThickness = 12;
+      const thickness = Math.max(minThickness, rightX - leftX);
+
+      const grad = ctx.createLinearGradient(leftX, yTop, rightX, yTop);
+      grad.addColorStop(0, hexToRgba(color, 0.9));
+      grad.addColorStop(0.5, hexToRgba('#ffffff', 0.18 + 0.18 * Math.max(depth, 0)));
+      grad.addColorStop(1, hexToRgba(color, 0.85));
+
+      ctx.fillStyle = grad;
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.rect(leftX, yTop, thickness, height);
+      ctx.fill();
+      ctx.stroke();
+
+      // center highlight stripe
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(xInner, yTop + 8);
+      ctx.lineTo(xInner, yBottom - 8);
+      ctx.stroke();
+    }
+
+    function drawPanels() {
+      const panelData = colors.map((color, idx) => {
+        const panelAngle = angle + idx * (Math.PI / 2);
+        return { angle: panelAngle, color, depth: Math.cos(panelAngle) };
+      });
+
+      panelData.sort((a, b) => a.depth - b.depth);
+      panelData.forEach(panel => drawPanel(panel.angle, panel.color));
+    }
+
+    function drawAxis() {
+      ctx.save();
+      const columnGradient = ctx.createLinearGradient(center.x - 6, topY + 28, center.x + 6, topY + 28);
+      columnGradient.addColorStop(0, 'rgba(90, 120, 170, 0.25)');
+      columnGradient.addColorStop(0.5, 'rgba(200, 215, 255, 0.9)');
+      columnGradient.addColorStop(1, 'rgba(90, 120, 170, 0.25)');
+      ctx.fillStyle = columnGradient;
+      ctx.fillRect(center.x - 6, topY + 28, 12, doorHeight - 56);
+      ctx.restore();
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawFloor();
+      drawFrameBack();
+      drawPanels();
+      drawAxis();
+      drawFrameFront();
+
+      angle = (angle + 0.015) % (Math.PI * 2);
+      requestAnimationFrame(render);
+    }
+
+    render();
+  </script>
+</body>
+</html>
